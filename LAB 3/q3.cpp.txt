@@ -1,0 +1,249 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Passenger {
+    string name;
+    Passenger* next;
+    
+    Passenger(string n) {
+        name = n;
+        next = nullptr;
+    }
+};
+
+struct Flight {
+    string flightNumber;
+    Passenger* passengers;
+    Flight* next;
+    
+    Flight(string fn) {
+        flightNumber = fn;
+        passengers = nullptr;
+        next = nullptr;
+    }
+};
+
+class AirlineReservation {
+private:
+    Flight* flights;
+    
+    void insertPassengerAlphabetically(Passenger*& head, string name) {
+        Passenger* newPassenger = new Passenger(name);
+        
+        if (head == nullptr || head->name > name) {
+            newPassenger->next = head;
+            head = newPassenger;
+            return;
+        }
+        
+        Passenger* current = head;
+        while (current->next != nullptr && current->next->name < name) {
+            current = current->next;
+        }
+        
+        newPassenger->next = current->next;
+        current->next = newPassenger;
+    }
+    
+    bool removePassenger(Passenger*& head, string name) {
+        if (head == nullptr) return false;
+        
+        if (head->name == name) {
+            Passenger* temp = head;
+            head = head->next;
+            delete temp;
+            return true;
+        }
+        
+        Passenger* current = head;
+        while (current->next != nullptr && current->next->name != name) {
+            current = current->next;
+        }
+        
+        if (current->next != nullptr) {
+            Passenger* temp = current->next;
+            current->next = current->next->next;
+            delete temp;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    bool searchPassenger(Passenger* head, string name) {
+        Passenger* current = head;
+        while (current != nullptr) {
+            if (current->name == name) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+    
+    Flight* findFlight(string flightNumber) {
+        Flight* current = flights;
+        while (current != nullptr) {
+            if (current->flightNumber == flightNumber) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr;
+    }
+    
+public:
+    AirlineReservation() {
+        flights = nullptr;
+    }
+    
+    void addFlight(string flightNumber) {
+        Flight* newFlight = new Flight(flightNumber);
+        newFlight->next = flights;
+        flights = newFlight;
+    }
+    
+    void reserveTicket() {
+        string flightNumber, passengerName;
+        cout << "Enter flight number: ";
+        cin >> flightNumber;
+        cout << "Enter passenger name: ";
+        cin >> passengerName;
+        
+        Flight* flight = findFlight(flightNumber);
+        if (flight == nullptr) {
+            cout << "Flight not found. Adding new flight.\n";
+            addFlight(flightNumber);
+            flight = findFlight(flightNumber);
+        }
+        
+        if (searchPassenger(flight->passengers, passengerName)) {
+            cout << "Passenger already has a reservation on this flight.\n";
+            return;
+        }
+        
+        insertPassengerAlphabetically(flight->passengers, passengerName);
+        cout << "Ticket reserved successfully for " << passengerName << " on flight " << flightNumber << "\n";
+    }
+    
+    void cancelReservation() {
+        string flightNumber, passengerName;
+        cout << "Enter flight number: ";
+        cin >> flightNumber;
+        cout << "Enter passenger name: ";
+        cin >> passengerName;
+        
+        Flight* flight = findFlight(flightNumber);
+        if (flight == nullptr) {
+            cout << "Flight not found.\n";
+            return;
+        }
+        
+        if (removePassenger(flight->passengers, passengerName)) {
+            cout << "Reservation cancelled for " << passengerName << " on flight " << flightNumber << "\n";
+        } else {
+            cout << "No reservation found for " << passengerName << " on flight " << flightNumber << "\n";
+        }
+    }
+    
+    void checkReservation() {
+        string flightNumber, passengerName;
+        cout << "Enter flight number: ";
+        cin >> flightNumber;
+        cout << "Enter passenger name: ";
+        cin >> passengerName;
+        
+        Flight* flight = findFlight(flightNumber);
+        if (flight == nullptr) {
+            cout << "Flight not found.\n";
+            return;
+        }
+        
+        if (searchPassenger(flight->passengers, passengerName)) {
+            cout << passengerName << " has a reservation on flight " << flightNumber << "\n";
+        } else {
+            cout << passengerName << " does not have a reservation on flight " << flightNumber << "\n";
+        }
+    }
+    
+    void displayPassengers() {
+        string flightNumber;
+        cout << "Enter flight number: ";
+        cin >> flightNumber;
+        
+        Flight* flight = findFlight(flightNumber);
+        if (flight == nullptr) {
+            cout << "Flight not found.\n";
+            return;
+        }
+        
+        cout << "Passengers on flight " << flightNumber << ":\n";
+        Passenger* current = flight->passengers;
+        if (current == nullptr) {
+            cout << "No passengers on this flight.\n";
+            return;
+        }
+        
+        while (current != nullptr) {
+            cout << current->name << "\n";
+            current = current->next;
+        }
+    }
+    
+    void displayAllFlights() {
+        cout << "Available flights:\n";
+        Flight* current = flights;
+        if (current == nullptr) {
+            cout << "No flights available.\n";
+            return;
+        }
+        
+        while (current != nullptr) {
+            cout << "Flight " << current->flightNumber << "\n";
+            current = current->next;
+        }
+    }
+};
+
+int main() {
+    AirlineReservation system;
+    int choice;
+    
+    while (true) {
+        cout << "\nAirline Reservation System\n";
+        cout << "1. Reserve a ticket\n";
+        cout << "2. Cancel a reservation\n";
+        cout << "3. Check reservation\n";
+        cout << "4. Display passengers\n";
+        cout << "5. Display all flights\n";
+        cout << "6. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        
+        switch (choice) {
+            case 1:
+                system.reserveTicket();
+                break;
+            case 2:
+                system.cancelReservation();
+                break;
+            case 3:
+                system.checkReservation();
+                break;
+            case 4:
+                system.displayPassengers();
+                break;
+            case 5:
+                system.displayAllFlights();
+                break;
+            case 6:
+                cout << "Thank you for using the airline reservation system!\n";
+                return 0;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    }
+    
+    return 0;
+}

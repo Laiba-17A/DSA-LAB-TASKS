@@ -1,0 +1,98 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    Node* prev;
+    
+    Node(int val) {
+        data = val;
+        next = nullptr;
+        prev = nullptr;
+    }
+};
+
+class DoublyLinkedList {
+private:
+    Node* head;
+    Node* tail;
+    
+public:
+    DoublyLinkedList() {
+        head = nullptr;
+        tail = nullptr;
+    }
+    
+    void addAtEnd(int val) {
+        Node* newNode = new Node(val);
+        
+        if (head == nullptr) {
+            head = tail = newNode;
+            return;
+        }
+        
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+    
+    void concatenate(DoublyLinkedList& M) {
+        if (head == nullptr) {
+            head = M.head;
+            tail = M.tail;
+        } else if (M.head != nullptr) {
+            tail->next = M.head;
+            M.head->prev = tail;
+            tail = M.tail;
+        }
+        
+        M.head = nullptr;
+        M.tail = nullptr;
+    }
+    
+    void display() {
+        if (head == nullptr) {
+            cout << "List is empty" << endl;
+            return;
+        }
+        
+        Node* current = head;
+        while (current != nullptr) {
+            cout << current->data;
+            if (current->next != nullptr) {
+                cout << " <-> ";
+            }
+            current = current->next;
+        }
+        cout << endl;
+    }
+    
+    Node* getHead() { return head; }
+    Node* getTail() { return tail; }
+};
+
+int main() {
+    DoublyLinkedList L, M;
+    
+    L.addAtEnd(1);
+    L.addAtEnd(2);
+    L.addAtEnd(3);
+    
+    M.addAtEnd(4);
+    M.addAtEnd(5);
+    M.addAtEnd(6);
+    
+    cout << "List L: ";
+    L.display();
+    
+    cout << "List M: ";
+    M.display();
+    
+    L.concatenate(M);
+    
+    cout << "After concatenation L + M: ";
+    L.display();
+    
+    return 0;
+}

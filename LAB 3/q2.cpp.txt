@@ -1,0 +1,95 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+    
+    Node(int val) {
+        data = val;
+        next = nullptr;
+    }
+};
+
+class LinkedList {
+private:
+    Node* head;
+    
+public:
+    LinkedList() {
+        head = nullptr;
+    }
+    
+    void addAtEnd(int val) {
+        Node* newNode = new Node(val);
+        if (head == nullptr) {
+            head = newNode;
+            return;
+        }
+        
+        Node* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+    
+    void rotateList(int k) {
+        if (head == nullptr || k == 0) return;
+        
+        Node* current = head;
+        int count = 1;
+        
+        while (count < k && current != nullptr) {
+            current = current->next;
+            count++;
+        }
+        
+        if (current == nullptr) return;
+        
+        Node* kthNode = current;
+        
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        
+        current->next = head;
+        head = kthNode->next;
+        kthNode->next = nullptr;
+    }
+    
+    void display() {
+        Node* temp = head;
+        while (temp != nullptr) {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    LinkedList list;
+    
+    list.addAtEnd(5);
+    list.addAtEnd(3);
+    list.addAtEnd(1);
+    list.addAtEnd(8);
+    list.addAtEnd(6);
+    list.addAtEnd(4);
+    list.addAtEnd(2);
+    
+    cout << "Original list: ";
+    list.display();
+    
+    int k;
+    cout << "Enter the number: ";
+    cin >> k;
+    
+    list.rotateList(k);
+    
+    cout << "After rotation: ";
+    list.display();
+    
+    return 0;
+}

@@ -1,0 +1,131 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+template <typename T>
+struct Node {
+    T data;
+    Node* next;
+    
+    Node(T val) {
+        data = val;
+        next = nullptr;
+    }
+};
+
+template <typename T>
+class LinkedList {
+private:
+    Node<T>* head;
+    
+public:
+    LinkedList() {
+        head = nullptr;
+    }
+    
+    void addAtEnd(T val) {
+        Node<T>* newNode = new Node<T>(val);
+        if (head == nullptr) {
+            head = newNode;
+            return;
+        }
+        
+        Node<T>* temp = head;
+        while (temp->next != nullptr) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
+    }
+    
+    bool isPalindrome() {
+        if (head == nullptr) return true;
+        
+        vector<T> values;
+        Node<T>* current = head;
+        
+        while (current != nullptr) {
+            values.push_back(current->data);
+            current = current->next;
+        }
+        
+        int left = 0;
+        int right = values.size() - 1;
+        
+        while (left < right) {
+            if (values[left] != values[right]) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        
+        return true;
+    }
+    
+    void display() {
+        Node<T>* temp = head;
+        while (temp != nullptr) {
+            cout << temp->data;
+            if (temp->next != nullptr) {
+                cout << "->";
+            }
+            temp = temp->next;
+        }
+        cout << "->NULL" << endl;
+    }
+};
+
+int main() {
+    int choice;
+    cout << "Enter 1 for integers, 2 for characters: ";
+    cin >> choice;
+    
+    if (choice == 1) {
+        LinkedList<int> list;
+        int n, value;
+        
+        cout << "Enter the number of elements: ";
+        cin >> n;
+        
+        cout << "Enter the elements: ";
+        for (int i = 0; i < n; i++) {
+            cin >> value;
+            list.addAtEnd(value);
+        }
+        
+        cout << "Original list: ";
+        list.display();
+        
+        if (list.isPalindrome()) {
+            cout << "Linked List is a Palindrome" << endl;
+        } else {
+            cout << "Linked List is not a Palindrome" << endl;
+        }
+    } 
+    else {
+        LinkedList<char> list;
+        int n;
+        char value;
+        
+        cout << "Enter the number of characters: ";
+        cin >> n;
+        
+        cout << "Enter the characters: ";
+        for (int i = 0; i < n; i++) {
+            cin >> value;
+            list.addAtEnd(value);
+        }
+        
+        cout << "Original list: ";
+        list.display();
+        
+        if (list.isPalindrome()) {
+            cout << "Linked List is a Palindrome" << endl;
+        } else {
+            cout << "Linked List is not a Palindrome" << endl;
+        }
+    }
+    
+    return 0;
+}
