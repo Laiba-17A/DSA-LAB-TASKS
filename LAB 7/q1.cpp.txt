@@ -1,0 +1,191 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+struct Node {
+    string name;
+    int score;
+    Node* next;
+    
+    Node(string n, int s) {
+        name = n;
+        score = s;
+        next = nullptr;
+    }
+};
+
+void addNode(Node** head, string name, int score) {
+    Node* newNode = new Node(name, score);
+    if (*head == nullptr) {
+        *head = newNode;
+        return;
+    }
+    
+    Node* temp = *head;
+    while (temp->next != nullptr) {
+        temp = temp->next;
+    }
+    temp->next = newNode;
+}
+
+int getMax(Node* head) {
+    int max = head->score;
+    Node* current = head;
+    while (current != nullptr) {
+        if (current->score > max) {
+            max = current->score;
+        }
+        current = current->next;
+    }
+    return max;
+}
+
+void countSort(Node** head, int place) {
+    Node* buckets[10] = {nullptr};
+    Node* tails[10] = {nullptr};
+    
+    Node* current = *head;
+    while (current != nullptr) {
+        int digit = (current->score / place) % 10;
+        Node* temp = current;
+        current = current->next;
+        temp->next = nullptr;
+        
+        if (buckets[digit] == nullptr) {
+            buckets[digit] = temp;
+            tails[digit] = temp;
+        } else {
+            tails[digit]->next = temp;
+            tails[digit] = temp;
+        }
+    }
+    
+    *head = nullptr;
+    Node* tail = nullptr;
+    
+    for (int i = 0; i < 10; i++) {
+        if (buckets[i] != nullptr) {
+            if (*head == nullptr) {
+                *head = buckets[i];
+                tail = tails[i];
+            } else {
+                tail->next = buckets[i];
+                tail = tails[i];
+            }
+        }
+    }
+}
+
+void radixSort(Node** head) {
+    int max = getMax(*head);
+    
+    for (int place = 1; max / place > 0; place *= 10) {
+        countSort(head, place);
+    }
+}
+
+int countNodes(Node* head) {
+    int count = 0;
+    while (head != nullptr) {
+        count++;
+        head = head->next;
+    }
+    return count;
+}
+
+int binarySearch(Node* head, string name, int score) {
+    int n = countNodes(head);
+    Node** arr = new Node*[n];
+    
+    Node* current = head;
+    for (int i = 0; i < n; i++) {
+        arr[i] = current;
+        current = current->next;
+    }
+    
+    int left = 0, right = n - 1;
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        
+        if (arr[mid]->score == score && arr[mid]->name == name) {
+            delete[] arr;
+            return mid;
+        }
+        
+        if (arr[mid]->score < score) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    delete[] arr;
+    return -1;
+}
+
+void deleteNode(Node** head, string name, int score) {
+    int pos = binarySearch(*head, name, score);
+    
+    if (pos == -1) {
+        cout << "Record not found" << endl;
+        return;
+    }
+    
+    if (pos == 0) {
+        Node* temp = *head;
+        *head = (*head)->next;
+        delete temp;
+        cout << "Record deleted: " << name << " " << score << endl;
+        return;
+    }
+    
+    Node* current = *head;
+    for (int i = 0; i < pos - 1; i++) {
+        current = current->next;
+    }
+    
+    Node* temp = current->next;
+    current->next = temp->next;
+    delete temp;
+    cout << "Record deleted: " << name << " " << score << endl;
+}
+
+void display(Node* head) {
+    Node* current = head;
+    while (current != nullptr) {
+        cout << current->name << " " << current->score << endl;
+        current = current->next;
+    }
+}
+
+int main() {
+    Node* head = nullptr;
+    
+    addNode(&head, "Ayan", 90);
+    addNode(&head, "Zameer", 60);
+    addNode(&head, "Sara", 70);
+    addNode(&head, "Sohail", 30);
+    addNode(&head, "Ahmed", 20);
+    
+    cout << "Before sorting:" << endl;
+    display(head);
+    
+    radixSort(&head);
+    
+    cout << "\nAfter sorting:" << endl;
+    display(head);
+    
+    string name;
+    int score;
+    cout << "\nEnter name to delete: ";
+    cin >> name;
+    cout << "Enter score: ";
+    cin >> score;
+    
+    deleteNode(&head, name, score);
+    
+    cout << "\nUpdated list:" << endl;
+    display(head);
+    
+    return 0;
+}

@@ -1,0 +1,77 @@
+#include <iostream>
+using namespace std;
+
+int getMax(int arr[], int n) {
+    int max = arr[0];
+    for (int i = 1; i < n; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    return max;
+}
+
+void countSort(int arr[], int n, int place) {
+    int output[n];
+    int count[10] = {0};
+    
+    for (int i = 0; i < n; i++) {
+        count[(arr[i] / place) % 10]++;
+    }
+    
+    for (int i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+    
+    for (int i = n - 1; i >= 0; i--) {
+        output[count[(arr[i] / place) % 10] - 1] = arr[i];
+        count[(arr[i] / place) % 10]--;
+    }
+    
+    for (int i = 0; i < n; i++) {
+        arr[i] = output[i];
+    }
+}
+
+void radixSortAsc(int arr[], int n) {
+    int max = getMax(arr, n);
+    
+    for (int place = 1; max / place > 0; place *= 10) {
+        countSort(arr, n, place);
+    }
+}
+
+void radixSortDesc(int arr[], int n) {
+    radixSortAsc(arr, n);
+    
+    for (int i = 0; i < n / 2; i++) {
+        int temp = arr[i];
+        arr[i] = arr[n - i - 1];
+        arr[n - i - 1] = temp;
+    }
+}
+
+void display(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    int arr[] = {36, 987, 654, 2, 20, 99, 456, 957, 555, 420, 66, 3};
+    int n = 12;
+    
+    cout << "Original array: ";
+    display(arr, n);
+    
+    radixSortAsc(arr, n);
+    cout << "Ascending order: ";
+    display(arr, n);
+    
+    radixSortDesc(arr, n);
+    cout << "Descending order: ";
+    display(arr, n);
+    
+    return 0;
+}

@@ -1,0 +1,138 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+int comparisons = 0;
+
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partitionFirst(int arr[], int low, int high) {
+    int pivot = arr[low];
+    int i = low;
+    int j = high;
+    
+    while (i < j) {
+        while (i <= high && arr[i] <= pivot) {
+            comparisons++;
+            i++;
+        }
+        while (arr[j] > pivot) {
+            comparisons++;
+            j--;
+        }
+        if (i < j) {
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[low], &arr[j]);
+    return j;
+}
+
+int partitionRandom(int arr[], int low, int high) {
+    int random = low + rand() % (high - low + 1);
+    swap(&arr[random], &arr[low]);
+    return partitionFirst(arr, low, high);
+}
+
+int partitionMiddle(int arr[], int low, int high) {
+    int mid = (low + high) / 2;
+    swap(&arr[mid], &arr[low]);
+    return partitionFirst(arr, low, high);
+}
+
+int partitionMedian(int arr[], int low, int high) {
+    int mid = (low + high) / 2;
+    
+    if (arr[low] > arr[mid])
+        swap(&arr[low], &arr[mid]);
+    if (arr[low] > arr[high])
+        swap(&arr[low], &arr[high]);
+    if (arr[mid] > arr[high])
+        swap(&arr[mid], &arr[high]);
+    
+    swap(&arr[mid], &arr[low]);
+    return partitionFirst(arr, low, high);
+}
+
+void quickSort(int arr[], int low, int high, int choice) {
+    if (low < high) {
+        int pi;
+        
+        if (choice == 1) {
+            pi = partitionFirst(arr, low, high);
+        } else if (choice == 2) {
+            pi = partitionRandom(arr, low, high);
+        } else if (choice == 3) {
+            pi = partitionMiddle(arr, low, high);
+        } else {
+            pi = partitionMedian(arr, low, high);
+        }
+        
+        quickSort(arr, low, pi - 1, choice);
+        quickSort(arr, pi + 1, high, choice);
+    }
+}
+
+void copyArray(int source[], int dest[], int n) {
+    for (int i = 0; i < n; i++) {
+        dest[i] = source[i];
+    }
+}
+
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    srand(time(0));
+    int n = 10;
+    
+    int sorted[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int reversed[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+    int random[10];
+    
+    for (int i = 0; i < n; i++) {
+        random[i] = rand() % 100;
+    }
+    
+    cout << "Sorted array: ";
+    printArray(sorted, n);
+    cout << "Reverse sorted array: ";
+    printArray(reversed, n);
+    cout << "Random array: ";
+    printArray(random, n);
+    cout << endl;
+    
+    string strategies[] = {"First Element", "Random Element", "Middle Element", "Median of Three"};
+    int tempArr[10];
+    
+    for (int strategy = 1; strategy <= 4; strategy++) {
+        cout << strategies[strategy - 1] << " as Pivot:" << endl;
+        
+        copyArray(sorted, tempArr, n);
+        comparisons = 0;
+        quickSort(tempArr, 0, n - 1, strategy);
+        cout << "Sorted array - Comparisons: " << comparisons << endl;
+        
+        copyArray(reversed, tempArr, n);
+        comparisons = 0;
+        quickSort(tempArr, 0, n - 1, strategy);
+        cout << "Reverse sorted array - Comparisons: " << comparisons << endl;
+        
+        copyArray(random, tempArr, n);
+        comparisons = 0;
+        quickSort(tempArr, 0, n - 1, strategy);
+        cout << "Random array - Comparisons: " << comparisons << endl;
+        cout << endl;
+    }
+    
+    return 0;
+}

@@ -1,0 +1,75 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Product {
+public:
+    string name;
+    double price;
+    string description;
+    bool available;
+    
+    Product() {
+        name = "";
+        price = 0.0;
+        description = "";
+        available = false;
+    }
+    
+    Product(string n, double p, string d, bool a) {
+        name = n;
+        price = p;
+        description = d;
+        available = a;
+    }
+};
+
+int partition(Product arr[], int low, int high) {
+    double pivot = arr[high].price;
+    int i = low - 1;
+    
+    for (int j = low; j < high; j++) {
+        if (arr[j].price < pivot) {
+            i++;
+            Product temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+    
+    Product temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+    
+    return i + 1;
+}
+
+void quickSort(Product arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void display(Product arr[], int n) {
+    cout << "Products sorted by price:" << endl;
+    for (int i = 0; i < n; i++) {
+        cout <<arr[i].name << " - $" << arr[i].price << endl;
+    }
+}
+
+int main() {
+    Product products[3];
+    
+    products[0] = Product("Product 1", 10.99, "This is product 1.", true);
+    products[1] = Product("Product 2", 5.99, "This is product 2.", false);
+    products[2] = Product("Product 3", 2.99, "This is product 3.", true);
+    
+    quickSort(products, 0, 2);
+    
+    display(products, 3);
+    
+    return 0;
+}
