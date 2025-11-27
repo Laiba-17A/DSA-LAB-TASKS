@@ -1,0 +1,147 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int key;
+    Node* left;
+    Node* right;
+    int height;
+};
+
+int height(Node* n) {
+    if (n == NULL) {
+        return 0;
+    }
+    return n->height;
+}
+
+Node* newNode(int key) {
+    Node* n = new Node();
+    n->key = key;
+    n->left = NULL;
+    n->right = NULL;
+    n->height = 1;
+    return n;
+}
+
+int balance(Node* n) {
+    if (n == NULL) {
+        return 0;
+    }
+    return height(n->left) - height(n->right);
+}
+
+Node* rightRotate(Node* y) {
+    Node* x = y->left;
+    Node* t2 = x->right;
+
+    x->right = y;
+    y->left = t2;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+Node* leftRotate(Node* x) {
+    Node* y = x->right;
+    Node* t2 = y->left;
+
+    y->left = x;
+    x->right = t2;
+
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+Node* insert(Node* node, int key) {
+    if (node == NULL) {
+        return newNode(key);
+    }
+
+    if (key < node->key) {
+        node->left = insert(node->left, key);
+    }
+    else if (key > node->key) {
+        node->right = insert(node->right, key);
+    }
+
+    node->height = max(height(node->left), height(node->right)) + 1;
+
+    int bf = balance(node);
+
+    if (bf > 1 && key < node->left->key) {
+        return rightRotate(node);
+    }
+
+    if (bf < -1 && key > node->right->key) {
+        return leftRotate(node);
+    }
+
+    if (bf > 1 && key > node->left->key) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    if (bf < -1 && key < node->right->key) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    return node;
+}
+
+void inorder(Node* root, int arr[], int& i) {
+    if (root == NULL) {
+        return;
+    }
+    inorder(root->left, arr, i);
+    arr[i] = root->key;
+    i++;
+    inorder(root->right, arr, i);
+}
+
+void kth(Node* root, int k) {
+    int arr[100];
+    int i = 0;
+
+    inorder(root, arr, i);
+
+    cout << "kth smallest: " << arr[k - 1] << endl;
+    cout << "kth largest: " << arr[i - k] << endl;
+}
+
+int leftHeight(Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+    return height(root->left);
+}
+
+int rightHeight(Node* root) {
+    if (root == NULL) {
+        return 0;
+    }
+    return height(root->right);
+}
+
+int main() {
+    Node* root = NULL;
+
+    int arr[] = {10, 20, 30, 40, 50, 60, 70};
+    for (int i = 0; i < 7; i++) {
+        root = insert(root, arr[i]);
+    }
+
+    int k = 3;
+
+    kth(root, k);
+
+    cout << "Left height: " << leftHeight(root) << endl;
+    cout << "Right height: " << rightHeight(root) << endl;
+
+    return 0;
+}
