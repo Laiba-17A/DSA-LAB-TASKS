@@ -80,9 +80,9 @@ void printTreeStructure(Node* root, string prefix = "", bool isLeft = true) {
     
     if (root->left || root->right) {
         if (root->left)
-            printTreeStructure(root->left, prefix + (isLeft ? "¦   " : "    "), true);
+            printTreeStructure(root->left, prefix + (isLeft ? "Â¦   " : "    "), true);
         if (root->right)
-            printTreeStructure(root->right, prefix + (isLeft ? "¦   " : "    "), false);
+            printTreeStructure(root->right, prefix + (isLeft ? "Â¦   " : "    "), false);
     }
 }
 
@@ -128,70 +128,4 @@ int main() {
     return 0;
 }
 
-/*
-=========================================================================================
-WHY AVL? EXPLAINED IN TWO LINES:
-=========================================================================================
 
-1. AVL trees maintain O(log n) time complexity for search, insert, and delete operations
-   by keeping the tree balanced, whereas BST can degrade to O(n) when unbalanced.
-
-2. The height-balancing property (|left_height - right_height| = 1) ensures the tree
-   depth stays minimal, preventing worst-case scenarios where BST becomes like a linked list.
-
-=========================================================================================
-CODE EXPLANATION (Each Step):
-=========================================================================================
-
-STEP 1: countNodes(root)
-- Recursively counts total number of nodes in the BST
-- WHY: We need to know array size for storing all node values
-- Returns total count which is used to allocate dynamic array
-
-STEP 2: storeInorder(root, arr[], index)
-- Performs inorder traversal of BST (left ? root ? right)
-- Stores all node values in array in sorted order using index parameter
-- For BST A: [4, 8, 9, 10] and BST B: [10, 12, 16, 18]
-- WHY: BST inorder gives sorted sequence, which we use to build balanced tree
-
-STEP 3: buildAVL(arr[], start, end)
-- Recursively builds a balanced AVL tree from sorted array
-- Picks middle element as root (ensures balance)
-- Recursively builds left subtree from left half [start to mid-1]
-- Recursively builds right subtree from right half [mid+1 to end]
-- Updates height at each node after building children
-- WHY: Middle element as root creates height-balanced tree automatically
-
-STEP 4: Node Linking in AVL
-- Each recursive call returns a Node* which becomes child of parent
-- Variables represent nodes at different levels during construction
-- For BST A: middle index gives 8 or 9 as root (depending on array size)
-- Left child gets built from smaller elements, right from larger
-- Parent stores returned pointers in left/right fields
-- WHY: Recursive approach naturally creates proper parent-child relationships
-
-STEP 5: Rotation Types (Available but not used in this approach)
-- RIGHT ROTATION: Used when left subtree is heavier (left-left case)
-  Moves left child up, original root becomes right child
-- LEFT ROTATION: Used when right subtree is heavier (right-right case)
-  Moves right child up, original root becomes left child
-- DOUBLE ROTATIONS: Combination for left-right/right-left cases
-- NOTE: This conversion rebuilds from scratch, so rotations aren't explicitly needed
-- Rotations would be used for incremental AVL insertions/deletions
-
-STEP 6: Node Returned (buildAVL returns Node*)
-- Each recursive call returns the root of the subtree it built
-- The final return is the root of the complete balanced AVL tree
-- This root has all children properly linked in balanced structure
-- Memory for array is freed after tree construction
-- WHY RETURN ROOT: Allows recursive construction where each level knows its subtree root
-
-3-4 LINE SUMMARY OF WHICH NODE IS RETURNED:
-The convertBSTtoAVL function returns the root node of the newly constructed balanced AVL 
-tree. This root is the middle element of the sorted array, with its left and right 
-children being roots of recursively built balanced subtrees. The returned node maintains 
-AVL properties with all heights and balance factors correctly set, ensuring O(log n) 
-operations for the tree.
-
-=========================================================================================
-*/
